@@ -1,4 +1,4 @@
-function fooBarQuix (number) {
+const fooBarQuix = number => {
     let response = '';
     let array = number.toString().split('');
 
@@ -24,7 +24,6 @@ function fooBarQuix (number) {
     
     return response;
 }
-
 
 const end = process.argv.splice(2);
 
