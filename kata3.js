@@ -14,10 +14,10 @@ Valor:
 * rey/King (K)
 * as/Ace (A). 
 
-//Picas: Spades
-//Trébol: Clover
-//Corazón: Heart
-//Diamante: Diamond
+Picas: Spades
+Trébol: Clover
+Corazón: Heart
+Diamante: Diamond
 */
 
 //Baraja Odenada
@@ -112,17 +112,20 @@ let hand2 = giveMeHand(RandomDeck).sort();
 //Trébol: Clover
 //Corazón: Heart
 //Diamante: Diamond
+//hand1 = hand2 = ['S02','C02','H04','D07','D05'].sort(); //Pareja
 //hand1 = ['C06','C08','C05','C07','C04'].sort(); //Escalera de color
 //hand2 = ['D03','C03','S03','H03','C13'].sort(); //Poker
-hand1 = ['D06','C08','C05','C07','C04'].sort(); //Escalera
-hand2 = ['D03','C03','S03','D02','C02'].sort(); //Full
+//hand2 = ['D14','C14','S14','D02','C02'].sort(); //Full
+//hand2 = ['D05','D07','D03','D02','D10'].sort(); //Color
+//hand2 = ['S02','C04','D03','D06','D05'].sort(); //Escalera
+//hand2 = ['S02','C02','H02','D06','D05'].sort(); //Trio
+//hand2 = ['S02','C02','H03','D03','D05'].sort(); //Doble Pareja
+//hand2 = ['S02','C02','H04','D07','D05'].sort(); //Pareja
 console.log(`Hand1: ${hand1}`);
 console.log(`Hand2: ${hand2}`);
 /*********************************************/
 /*********************************************/
 /*********************************************/
-
-
 
 
 /*
@@ -198,7 +201,7 @@ for(let count=0; count<5; count++) {
 }
 */
 
-
+/*
 //PREVISUALIZAR MANOS DIVIDIDAS
 for(let count=0; count<hand1.length; count++) {
     console.log(`split2DHand1[${count}][0]:${split2DHand1[count][0]}`);
@@ -209,7 +212,7 @@ for(let count=0; count<hand1.length; count++) {
     console.log(`split2DHand2[${count}][0]:${split2DHand2[count][0]}`);
     console.log(`split2DHand2[${count}][1]:${split2DHand2[count][1]}`);
 }
-
+*/
 
 
 //ESCALERA DE COLOR (OK)
@@ -235,11 +238,9 @@ if(split2DHand1[0][0]===split2DHand1[1][0] && split2DHand1[0][0]===split2DHand1[
 */
 
 
-
-
-let loadPlays = (split2DHand, winningPokerHand, player) => {
+let loadPlays = (split2DHand, hand, winningPokerHand, player) => {
     //Flus (Color)
-    if(split2DHand[0][0]===split2DHand[1][0] && split2DHand[0][0]===split2DHand[2][0] && split2DHand[0][0]===split2DHand[3][0] && split2DHand[0][0]===split2DHand[4][0])
+    if(split2DHand[0][1]===split2DHand[1][1] && split2DHand[0][1]===split2DHand[2][1] && split2DHand[0][1]===split2DHand[3][1] && split2DHand[0][1]===split2DHand[4][1])
         winningPokerHand[5][player]=1;
     
     //Straight (Escalera): [Guardamos el último valor más alto]
@@ -247,8 +248,8 @@ let loadPlays = (split2DHand, winningPokerHand, player) => {
     for (let index = 1; index < 5; index++) {
         numIni = parseInt(split2DHand[0][0])+index;
         numFin = parseInt(split2DHand[0+index][0]);
-        console.log("numIni: " + numIni);
-        console.log("numFin: " + numFin);
+        //console.log("numIni: " + numIni);
+        //console.log("numFin: " + numFin);
         if (numIni !== numFin) {
             isSequential = 0;
             index = 5;
@@ -261,11 +262,53 @@ let loadPlays = (split2DHand, winningPokerHand, player) => {
     if(winningPokerHand[5][player] && winningPokerHand[4][player])
         winningPokerHand[8][player] = winningPokerHand[4][player];
 
+    //Contamos cartas para Poker/Trio/DoblesParejas/Pareja...
+    let countCards = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+    let num = 0;
+    for (let index = 0; index < hand.length; index++) {
+        num = parseInt(hand[index].substr(1,2));
+        countCards[num-2]+=1; //The number 2 is in countCards[0] (-2)
+    }
+    //console.log ("countCards: " + countCards);
+
+    //Poker/Trio/DoblesParejas/Pareja
+    let pairFound = 0;
+    let threeOfAKindFound = 0;
+    for (let i = 0; i < countCards.length; i++) {
+        if(countCards[i]===2 && !pairFound){
+            //At least we have 1 pair
+            winningPokerHand[1][player] = i+2; //+2: Because countCards[0] = card 2
+            for (let x = (i+1); x < countCards.length; x++) {
+                if(countCards[x]===2) //We have to control two pairs
+                    winningPokerHand[2][player] = x+2; //+2: Because countCards[0] = card 2
+            }
+            pairFound = 1;
+        }
+        if(countCards[i]===3) {
+            winningPokerHand[3][player] = i+2; //+2: Because countCards[0] = card 2
+            threeOfAKindFound = i+2;
+        }
+        if(countCards[i]===4)
+            winningPokerHand[7][player] = i+2; //+2: Because countCards[0] = card 2
+    }
+    if (pairFound && threeOfAKindFound)
+        winningPokerHand[6][player] = threeOfAKindFound;
+    
+    //HihgCard (CartaAlta)
+    num = 0;
+    let max = 0;
+    for (let index = 0; index < hand.length; index++) {
+        num = parseInt(hand[index].substr(1,2));
+        if (num > max)
+            max = num;
+    }
+    winningPokerHand[0][player] = max;
+
     return winningPokerHand;
 }
 
-winningPokerHand = loadPlays(split2DHand1, winningPokerHand, 0);
-winningPokerHand = loadPlays(split2DHand2, winningPokerHand, 1);
+winningPokerHand = loadPlays(split2DHand1, hand1, winningPokerHand, 0);
+winningPokerHand = loadPlays(split2DHand2, hand2, winningPokerHand, 1);
 
 /*
 //Flus (Color)
@@ -317,7 +360,7 @@ if(winningPokerHand[5][1] && winningPokerHand[4][1])
     winningPokerHand[8][1] = winningPokerHand[4][1];
 */
 
-
+/*
 //HihgCard (CartaAlta)
 let num1 = 0, num2 = 0, max1 = 0, max2 = 0;
 for (let index = 0; index < hand1.length; index++) {
@@ -333,14 +376,14 @@ winningPokerHand[0][1] = max2;
 
 //console.log("Max1:" + max1);
 //console.log("Max2:" + max2);
-
+*/
 
 
 //winningPokerHand = [+0            1       2           3              +4          +5      6            7              +8];
 //winningPokerHand = ['HihgCard', 'Pair', 'TwoPairs', 'ThreeOfAKind', 'Straight', 'Flus', 'FullHouse', 'FourOfAKind', 'StraightFlush'];
 //winningPokerHand = ['CartaAlta', 'Pareja', 'DoblePareja', 'Trio', 'Escalera', 'Color', 'Full(Trio+Pareja)', 'Poker', 'EscaleraColor'];
 
-
+/*
 let countCards = [0,0,0,0,0,0,0,0,0,0,0,0,0];
 let num = 0;
 
@@ -366,18 +409,18 @@ for (let i = 0; i < countCards.length; i++) {
     if(countCards[i]===4)
         winningPokerHand[7][1] = i+2; //+2: Because countCards[0] = card 2
 }
-
+*/
 
 
 console.log("---");
 //PREVIEW POSSIBLE WINNING MOVES
 for (let index = 0; index < winningPokerHand.length; index++) {
-    console.log(`Jugador1 - Objeto[${index}][0]: ${winningPokerHand[index][0]}`);
+    console.log(`+Jugador1 - Objeto[${index}][0]: ${winningPokerHand[index][0]}`);
     //console.log(`Jugador2 - Objeto[${index}][1]: ${winningPokerHand[index][1]}`);
 }
 console.log("---");
 for (let index = 0; index < winningPokerHand.length; index++) {
     //console.log(`Jugador1 - Objeto[${index}][0]: ${winningPokerHand[index][0]}`);
-    console.log(`Jugador2 - Objeto[${index}][1]: ${winningPokerHand[index][1]}`);
+    console.log(`+Jugador2 - Objeto[${index}][1]: ${winningPokerHand[index][1]}`);
 }
 console.log("---");
