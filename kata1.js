@@ -34,4 +34,4 @@ if ( (!isNaN(end)) && end > 0 && end < 101 ) {
     }
 } 
 else 
-    console.log('Introduzca un número entre 1 y 100');
+    console.log('Enter a number between 1 and 100.');
