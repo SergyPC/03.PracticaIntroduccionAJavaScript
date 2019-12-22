@@ -1,3 +1,5 @@
+'use strict';
+
 const toRoman = number => {
   let romanNumber = "";
   let digit = 0;
