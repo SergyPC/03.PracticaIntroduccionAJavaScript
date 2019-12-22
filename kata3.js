@@ -59,39 +59,6 @@ let giveMeHand = (RandomDeck) => {
 let hand1 = giveMeHand(RandomDeck).sort();
 let hand2 = giveMeHand(RandomDeck).sort();
 
-/*********************************************/
-/*********************************************/
-/*********************************************/
-//winningPokerHand = [+0            1       2           3              +4          +5      6            7              +8];
-//winningPokerHand = ['HihgCard', 'Pair', 'TwoPairs', 'ThreeOfAKind', 'Straight', 'Flus', 'FullHouse', 'FourOfAKind', 'StraightFlush'];
-//winningPokerHand = ['CartaAlta', 'Pareja', 'DoblePareja', 'Trio', 'Escalera', 'Color', 'Full(Trio+Pareja)', 'Poker', 'EscaleraColor'];
-//Picas: Spades
-//Trébol: Clover
-//Corazón: Heart
-//Diamante: Diamond
-//hand1 = ['C06','C08','C05','C07','C04'].sort(); //Escalera de color
-//hand2 = ['C06','C08','C05','C07','C04'].sort(); //Escalera de color
-//hand1 = ['D04','C04','S04','H04','C13'].sort(); //Poker
-//hand2 = ['D03','C03','S03','H03','C13'].sort(); //Poker
-//hand1 = ['D13','C13','S13','D02','C02'].sort(); //Full
-//hand2 = ['D14','C14','S14','D02','C02'].sort(); //Full
-//hand1 = ['D05','D07','D03','D02','D10'].sort(); //Color
-//hand2 = ['D05','D07','D03','D02','D09'].sort(); //Color
-//hand1 = ['S02','C04','D03','D06','D05'].sort(); //Escalera
-//hand2 = ['S07','C04','D03','D06','D05'].sort(); //Escalera
-//hand1 = ['S03','C03','H03','D06','D05'].sort(); //Trio
-//hand2 = ['S07','C07','H07','D06','D05'].sort(); //Trio
-//hand1 = ['S04','C02','H02','D04','D05'].sort(); //Doble Pareja
-//hand2 = ['S05','C02','H03','D03','D05'].sort(); //Doble Pareja
-//hand1 = ['S03','C03','H04','D07','D05'].sort(); //Pareja
-//hand2 = ['S05','C02','H04','D07','D05'].sort(); //Pareja
-//console.log(`Hand1: ${hand1}`);
-//console.log(`Hand2: ${hand2}`);
-/*********************************************/
-/*********************************************/
-/*********************************************/
-
-
 //Split your hand to separate NumberCard and TypeCard
 let split2DHand1 = new Array(5);
 let split2DHand2 = new Array(5);
@@ -181,7 +148,6 @@ winningPokerHand = loadPlays(split2DHand2, hand2, winningPokerHand, 1);
 const whoWins = (winningPokerHand) => {
     let winner = "";
     const pokerHand = ['Hihg card', 'Pair', 'Two pairs', 'Three of a kind', 'Straight', 'Flus', 'Full house', 'Four of a kind', 'Straight flush'];
-    
     for(let count=8; count>=0; count--) {
         if(winningPokerHand[count][0] || winningPokerHand[count][1]) {
             if (winningPokerHand[count][0] > winningPokerHand[count][1])
@@ -200,7 +166,6 @@ const whoWins = (winningPokerHand) => {
 const convertHand = (hand) => {
     let handAux = ['','','','',''];
     let number = 0;
-    
     for (let count = 0; count < 5; count++) {
         number = parseInt(hand[count].substr(1,2));
         if(number < 10)
