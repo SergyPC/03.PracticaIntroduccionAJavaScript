@@ -112,15 +112,22 @@ let hand2 = giveMeHand(RandomDeck).sort();
 //Trébol: Clover
 //Corazón: Heart
 //Diamante: Diamond
-//hand1 = hand2 = ['S02','C02','H04','D07','D05'].sort(); //Pareja
 //hand1 = ['C06','C08','C05','C07','C04'].sort(); //Escalera de color
+//hand2 = ['C06','C08','C05','C07','C04'].sort(); //Escalera de color
+//hand1 = ['D04','C04','S04','H04','C13'].sort(); //Poker
 //hand2 = ['D03','C03','S03','H03','C13'].sort(); //Poker
+//hand1 = ['D13','C13','S13','D02','C02'].sort(); //Full
 //hand2 = ['D14','C14','S14','D02','C02'].sort(); //Full
-//hand2 = ['D05','D07','D03','D02','D10'].sort(); //Color
-//hand2 = ['S02','C04','D03','D06','D05'].sort(); //Escalera
-//hand2 = ['S02','C02','H02','D06','D05'].sort(); //Trio
-//hand2 = ['S02','C02','H03','D03','D05'].sort(); //Doble Pareja
-//hand2 = ['S02','C02','H04','D07','D05'].sort(); //Pareja
+//hand1 = ['D05','D07','D03','D02','D10'].sort(); //Color
+//hand2 = ['D05','D07','D03','D02','D09'].sort(); //Color
+//hand1 = ['S02','C04','D03','D06','D05'].sort(); //Escalera
+//hand2 = ['S07','C04','D03','D06','D05'].sort(); //Escalera
+//hand1 = ['S03','C03','H03','D06','D05'].sort(); //Trio
+//hand2 = ['S07','C07','H07','D06','D05'].sort(); //Trio
+//hand1 = ['S04','C02','H02','D04','D05'].sort(); //Doble Pareja
+//hand2 = ['S05','C02','H03','D03','D05'].sort(); //Doble Pareja
+//hand1 = ['S03','C03','H04','D07','D05'].sort(); //Pareja
+//hand2 = ['S05','C02','H04','D07','D05'].sort(); //Pareja
 console.log(`Hand1: ${hand1}`);
 console.log(`Hand2: ${hand2}`);
 /*********************************************/
@@ -239,9 +246,19 @@ if(split2DHand1[0][0]===split2DHand1[1][0] && split2DHand1[0][0]===split2DHand1[
 
 
 let loadPlays = (split2DHand, hand, winningPokerHand, player) => {
+    //HihgCard (CartaAlta)
+    let num = 0;
+    let max = 0;
+    for (let index = 0; index < hand.length; index++) {
+        num = parseInt(hand[index].substr(1,2));
+        if (num > max)
+            max = num;
+    }
+    winningPokerHand[0][player] = max;
+
     //Flus (Color)
     if(split2DHand[0][1]===split2DHand[1][1] && split2DHand[0][1]===split2DHand[2][1] && split2DHand[0][1]===split2DHand[3][1] && split2DHand[0][1]===split2DHand[4][1])
-        winningPokerHand[5][player]=1;
+        winningPokerHand[5][player] = max; //We put the highest card (max)
     
     //Straight (Escalera): [Guardamos el último valor más alto]
     let numIni = 0, numFin = 0, isSequential = 1;
@@ -264,7 +281,7 @@ let loadPlays = (split2DHand, hand, winningPokerHand, player) => {
 
     //Contamos cartas para Poker/Trio/DoblesParejas/Pareja...
     let countCards = [0,0,0,0,0,0,0,0,0,0,0,0,0];
-    let num = 0;
+    num = 0;
     for (let index = 0; index < hand.length; index++) {
         num = parseInt(hand[index].substr(1,2));
         countCards[num-2]+=1; //The number 2 is in countCards[0] (-2)
@@ -294,16 +311,6 @@ let loadPlays = (split2DHand, hand, winningPokerHand, player) => {
     if (pairFound && threeOfAKindFound)
         winningPokerHand[6][player] = threeOfAKindFound;
     
-    //HihgCard (CartaAlta)
-    num = 0;
-    let max = 0;
-    for (let index = 0; index < hand.length; index++) {
-        num = parseInt(hand[index].substr(1,2));
-        if (num > max)
-            max = num;
-    }
-    winningPokerHand[0][player] = max;
-
     return winningPokerHand;
 }
 
@@ -424,3 +431,96 @@ for (let index = 0; index < winningPokerHand.length; index++) {
     console.log(`+Jugador2 - Objeto[${index}][1]: ${winningPokerHand[index][1]}`);
 }
 console.log("---");
+
+
+
+let whoWins = (winningPokerHand) => {
+    let winner = "";
+    const pokerHand = ['Hihg card', 'Pair', 'Two pairs', 'Three of a kind', 'Straight', 'Flus', 'Full house', 'Four of a kind', 'Straight flush'];
+    
+    for(let count=8; count>=0; count--) {
+        if(winningPokerHand[count][0] || winningPokerHand[count][1]) {
+            if (winningPokerHand[count][0] > winningPokerHand[count][1])
+                winner = `Player 1 win (${pokerHand[count]})`;
+            else if (winningPokerHand[count][0] < winningPokerHand[count][1])
+                winner = `Player 2 win (${pokerHand[count]})`;
+            else
+                winner = `The players tie (${pokerHand[count]})`;
+            count = -1;
+        }
+    }
+
+    /*
+    if(winningPokerHand[8][0] || winningPokerHand[8][1]) {
+        if (winningPokerHand[8][0] > winningPokerHand[8][1])
+            winner = "Gamer 1 win (Straight Flush)";
+        else if (winningPokerHand[8][0] < winningPokerHand[8][1])
+            winner = "Gamer 2 win (Straight Flush)";
+        else
+            winner = "The players tie";
+    }
+
+    if(!winner && (winningPokerHand[8][0] || winningPokerHand[8][1])) {
+        if (winningPokerHand[8][0] > winningPokerHand[8][1])
+            winner = "Gamer 1 win (Straight Flush)";
+        else if (winningPokerHand[8][0] < winningPokerHand[8][1])
+            winner = "Gamer 2 win (Straight Flush)";
+        else
+            winner = "The players tie";
+    }
+    */
+   
+
+    return winner;
+}
+
+const convertHand = (hand) => {
+    let handAux = ['','','','',''];
+    let number = 0;
+    //let splitCard = [];
+    
+    for (let count = 0; count < 5; count++) {
+        //splitCard = hand[count].split;
+        //handAux[count] = splitCard[]
+        //parseInt(hand[index].substr(1,2));
+        
+        number = parseInt(hand[count].substr(1,2));
+        if(number < 10)
+            handAux[count] = number.toString().concat(hand[count].substr(0,1));
+            //handAux[count] = (hand[count].substr(1,2)).toString().concat(hand[count].substr(0,1));
+        else {
+            switch (parseInt(hand[count].substr(1,2))){
+                case 10:
+                    handAux[count] = 'T'.toString().concat(hand[count].substr(0,1));
+                    break;
+                case 11:
+                    handAux[count] = 'J'.toString().concat(hand[count].substr(0,1));
+                    break;
+                case 12:
+                    handAux[count] = 'Q'.toString().concat(hand[count].substr(0,1));
+                    break;
+                case 13:
+                    handAux[count] = 'K'.toString().concat(hand[count].substr(0,1));
+                    break;
+                case 14:
+                    handAux[count] = 'A'.toString().concat(hand[count].substr(0,1));
+                    break;  
+            }
+        }
+        
+       
+    }
+    
+
+    return handAux;
+}
+
+console.log(`Player 1: ${convertHand(hand1)}`);
+console.log(`Player 2: ${convertHand(hand2)}`);
+console.log(whoWins(winningPokerHand));
+
+/*
+Jugador 1: 2H 3D 5S 9C KD
+Jugador 2: 2C 3H 4S 8C KH
+Jugador 1 gana (carta más alta)
+*/
