@@ -1,3 +1,5 @@
+'use strict';
+
 const fooBarQuix = number => {
     let response = '';
     let array = number.toString().split('');
